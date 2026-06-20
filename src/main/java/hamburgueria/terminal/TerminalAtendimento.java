@@ -68,7 +68,7 @@ public class TerminalAtendimento {
             throw new IllegalArgumentException("Sistema de checkout indisponível.");
         }
         // Delega para a Facade, que acionará o Strategy, o Proxy e a Bridge
-        return facade.finalizarPedido(this.carrinho, estrategia, gateway, metodo);
+        return facade.finalizarPedido(this.carrinho, estrategia, gateway);
     }
 
     public void processarRelatorioCardapio(hamburgueria.relatorios.RelatorioGerencial gerencial,

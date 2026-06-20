@@ -1,7 +1,5 @@
 package hamburgueria.financeiro.proxy;
 
-import hamburgueria.financeiro.bridge.MetodoPagamentoAbstraction;
-
 public class GatewayPagamentoProxy implements IGatewayPagamento {
     private final IGatewayPagamento gatewayReal;
     private int tentativas = 0;
@@ -11,13 +9,13 @@ public class GatewayPagamentoProxy implements IGatewayPagamento {
     }
 
     @Override
-    public boolean cobrar(MetodoPagamentoAbstraction metodo, double valor) {
+    public boolean cobrar(double valor) {
         if (valor <= 0)
             throw new IllegalArgumentException("Valor inválido para cobrança.");
         if (tentativas >= 3)
             throw new SecurityException("Muitas tentativas falhas. Bloqueado por fraude.");
 
-        boolean sucesso = gatewayReal.cobrar(metodo, valor);
+        boolean sucesso = gatewayReal.cobrar(valor);
         if (!sucesso) {
             tentativas++;
         } else {

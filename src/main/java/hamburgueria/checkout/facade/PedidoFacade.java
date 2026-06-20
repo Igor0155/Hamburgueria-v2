@@ -6,15 +6,13 @@ import hamburgueria.cozinha.factorymethod.TipoHamburguer;
 import hamburgueria.cozinha.singleton.EventBus;
 import hamburgueria.cozinha.singleton.EventoPedidoPago;
 import hamburgueria.cozinha.state.PedidoCozinha;
-import hamburgueria.financeiro.bridge.MetodoPagamentoAbstraction;
 import hamburgueria.financeiro.proxy.IGatewayPagamento;
 import hamburgueria.financeiro.strategy.IEstrategiaPrecificacao;
 
 public class PedidoFacade {
     public boolean finalizarPedido(CarrinhoCompras carrinho,
             IEstrategiaPrecificacao estrategia,
-            IGatewayPagamento gateway,
-            MetodoPagamentoAbstraction metodo) {
+            IGatewayPagamento gateway) {
 
         if (carrinho == null || carrinho.getItens().isEmpty()) {
             throw new IllegalStateException("O carrinho está vazio.");
@@ -26,7 +24,7 @@ public class PedidoFacade {
 
         double subtotal = carrinho.getSubtotal();
         double valorFinal = estrategia.calcularTotal(subtotal);
-        boolean pago = gateway.cobrar(metodo, valorFinal);
+        boolean pago = gateway.cobrar(valorFinal);
 
         if (pago) {
             PedidoCozinha pedidoCozinha = new PedidoCozinha("PED-" + System.nanoTime());
