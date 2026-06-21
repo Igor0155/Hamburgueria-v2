@@ -30,34 +30,35 @@ public class FacadeTest {
     @Test
     public void deveFinalizarPedidoComSucesso() {
         carrinho.adicionarItem(new HamburguerArtesanal());
-        assertTrue(facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(), new GatewayReal(),
-                new PagamentoPix(new StripeAPI())));
+        assertTrue(
+                facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(),
+                        new GatewayReal(new PagamentoPix(new StripeAPI()))));
     }
 
     @Test
     public void deveRecusarPedidoComCarrinhoVazio() {
         assertThrows(IllegalStateException.class, () -> facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(),
-                new GatewayReal(), new PagamentoPix(new StripeAPI())));
+                new GatewayReal(new PagamentoPix(new StripeAPI()))));
     }
 
     @Test
     public void deveRecusarPedidoComCarrinhoNulo() {
         assertThrows(IllegalStateException.class, () -> facade.finalizarPedido(null, new PrecoTaxaNoturnaStrategy(),
-                new GatewayReal(), new PagamentoPix(new StripeAPI())));
+                new GatewayReal(new PagamentoPix(new StripeAPI()))));
     }
 
     @Test
     public void deveLancarExcecaoSeGatewayNulo() {
         carrinho.adicionarItem(new HamburguerArtesanal());
         assertThrows(IllegalArgumentException.class, () -> facade.finalizarPedido(carrinho,
-                new PrecoTaxaNoturnaStrategy(), null, new PagamentoPix(new StripeAPI())));
+                new PrecoTaxaNoturnaStrategy(), null));
     }
 
     @Test
     public void deveEsvaziarCarrinhoAposSucesso() {
         carrinho.adicionarItem(new HamburguerArtesanal());
-        facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(), new GatewayReal(),
-                new PagamentoPix(new StripeAPI()));
+        facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(),
+                new GatewayReal(new PagamentoPix(new StripeAPI())));
         assertEquals(0, carrinho.getItens().size());
     }
 
@@ -65,7 +66,7 @@ public class FacadeTest {
     public void deveManterCarrinhoSePagamentoFalhar() {
         carrinho.adicionarItem(new HamburguerArtesanal());
         PagamentoPix pixFalho = new PagamentoPix(v -> false);
-        facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(), new GatewayReal(), pixFalho);
+        facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(), new GatewayReal(pixFalho));
         assertEquals(1, carrinho.getItens().size());
     }
 
@@ -76,8 +77,8 @@ public class FacadeTest {
         EventBus.getInstancia().inscrever(e -> eventoRecebido[0] = e.getNomeEvento().equals("PEDIDO_PAGO"));
 
         carrinho.adicionarItem(new HamburguerArtesanal());
-        facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(), new GatewayReal(),
-                new PagamentoPix(new StripeAPI()));
+        facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(),
+                new GatewayReal(new PagamentoPix(new StripeAPI())));
 
         assertTrue(eventoRecebido[0]);
     }
@@ -86,7 +87,7 @@ public class FacadeTest {
     public void deveRetornarFalsoSePagamentoFalhar() {
         carrinho.adicionarItem(new HamburguerArtesanal());
         PagamentoPix pixFalho = new PagamentoPix(v -> false);
-        assertFalse(facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(), new GatewayReal(), pixFalho));
+        assertFalse(facade.finalizarPedido(carrinho, new PrecoTaxaNoturnaStrategy(), new GatewayReal(pixFalho)));
     }
 
     @Test
