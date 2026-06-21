@@ -31,6 +31,7 @@ C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\catalogo\fa
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\integracao\adapter\AdaptadorLoggi.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\montagem\builder\MonsterWheyBuilder.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\terminal\TerminalAtendimento.java
+C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\financeiro\bridge\PagamentoCartaoCredito.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\cozinha\factorymethod\EstacaoFactoryReal.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\catalogo\factory\BatataRustica.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\financeiro\proxy\IGatewayPagamento.java
@@ -38,6 +39,7 @@ C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\montagem\de
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\financeiro\interpreter\IExpressao.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\cozinha\mediator\ICozinhaMediator.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\cozinha\singleton\IEvento.java
+C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\catalogo\factory\ComboAgregado.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\carrinho\command\ICarrinhoCommand.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\catalogo\iterator\IIteradorCardapio.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\cozinha\singleton\EventBus.java
@@ -71,6 +73,7 @@ C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\cozinha\tem
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\catalogo\factory\BatataPalito.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\cozinha\chain\VerificadorEmbalagem.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\financeiro\bridge\StripeAPI.java
+C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\financeiro\bridge\PagamentoCartaoDebito.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\catalogo\prototype\ComboHistorico.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\carrinho\command\InvocadorCarrinho.java
 C:\Users\igorx\Desktop\Hamburgueria-teste\src\main\java\hamburgueria\cozinha\singleton\IListener.java

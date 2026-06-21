@@ -10,10 +10,12 @@ hamburgueria\catalogo\iterator\IIteradorCardapio.class
 hamburgueria\checkout\facade\PedidoFacade.class
 hamburgueria\financeiro\bridge\PagamentoPix.class
 hamburgueria\cozinha\chain\BaseVerificadorQualidade.class
+hamburgueria\financeiro\bridge\PagamentoCartaoDebito.class
 hamburgueria\cozinha\chain\VerificadorEmbalagem.class
 hamburgueria\financeiro\strategy\PrecoTaxaNoturnaStrategy.class
 hamburgueria\catalogo\factory\IComboFactory.class
 hamburgueria\catalogo\iterator\ColecaoItens.class
+hamburgueria\catalogo\factory\ComboAgregado.class
 hamburgueria\financeiro\interpreter\VariavelExpressao.class
 hamburgueria\relatorios\visitor\IVisitavel.class
 hamburgueria\financeiro\bridge\IProcessadorAPI.class
@@ -70,6 +72,7 @@ hamburgueria\financeiro\interpreter\NumeroExpressao.class
 hamburgueria\catalogo\iterator\IteradorListaLinear.class
 hamburgueria\relatorios\visitor\RelatorioLucratividadeVisitor.class
 hamburgueria\cozinha\factorymethod\EstacaoFactoryReal.class
+hamburgueria\financeiro\bridge\PagamentoCartaoCredito.class
 hamburgueria\monitoramento\observer\IStatusObserver.class
 hamburgueria\carrinho\command\AdicionarItemCommand.class
 hamburgueria\catalogo\composite\IItemCardapio.class
