@@ -4,12 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
+import hamburgueria.catalogo.factory.BatataRustica;
+import hamburgueria.catalogo.factory.ComboAgregado;
 import hamburgueria.catalogo.factory.ComboArtesanalFactory;
 import hamburgueria.catalogo.factory.ComboSmashFactory;
+import hamburgueria.catalogo.factory.HamburguerArtesanal;
+import hamburgueria.catalogo.factory.IHamburguer;
 import hamburgueria.cozinha.factorymethod.EstacaoFactoryReal;
 import hamburgueria.cozinha.factorymethod.IEstacaoFactory;
 import hamburgueria.cozinha.factorymethod.ITipoAlimento;
@@ -122,5 +127,54 @@ public class FactoryMethodTest {
         PreparoFritadeira fritadeira = new PreparoFritadeira();
         fritadeira.executarPreparoPadrao(new hamburgueria.cozinha.state.PedidoCozinha("2"));
         assertTrue(fritadeira.isConcluido());
+    }
+
+    @Test
+    public void deveRetornarDescricaoConcatenadaCorretamenteNoCombo() {
+        ComboAgregado combo = new ComboAgregado(new HamburguerArtesanal(), new BatataRustica(), 10.0);
+        assertEquals("COMBO: Hambúrguer Artesanal 200g + Batata Rústica com Alecrim", combo.getDescricao());
+    }
+
+    @Test
+    public void deveRetornarCustoSomadoCorretamenteNoCombo() {
+        // Hambúrguer Artesanal custa 35.0. Somando 12.0 do adicional.
+        ComboAgregado combo = new ComboAgregado(new HamburguerArtesanal(), new BatataRustica(), 12.0);
+        assertEquals(47.0, combo.getCusto());
+    }
+
+    @Test
+    public void deveLancarExcecaoSeHamburguerForNuloNaMontagemDoCombo() {
+        assertThrows(IllegalArgumentException.class, () -> new ComboAgregado(null, new BatataRustica(), 10.0));
+    }
+
+    @Test
+    public void deveLancarExcecaoSeAcompanhamentoForNuloNaMontagemDoCombo() {
+        assertThrows(IllegalArgumentException.class, () -> new ComboAgregado(new HamburguerArtesanal(), null, 10.0));
+    }
+
+    @Test
+    public void deveLancarExcecaoSeValorAdicionalDoComboForNegativo() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new ComboAgregado(new HamburguerArtesanal(), new BatataRustica(), -5.0));
+    }
+
+    @Test
+    public void deveRetornarInstanciaCorretaDoHamburguerPrincipalEncapsulado() {
+        HamburguerArtesanal artesanal = new HamburguerArtesanal();
+        ComboAgregado combo = new ComboAgregado(artesanal, new BatataRustica(), 10.0);
+        assertSame(artesanal, combo.getHamburguerPrincipal());
+    }
+
+    @Test
+    public void deveRetornarInstanciaCorretaDoAcompanhamentoEncapsulado() {
+        BatataRustica batata = new BatataRustica();
+        ComboAgregado combo = new ComboAgregado(new HamburguerArtesanal(), batata, 10.0);
+        assertSame(batata, combo.getAcompanhamento());
+    }
+
+    @Test
+    public void deveGarantirQueOComboPolimorficoImplementaInterfaceIHamburguer() {
+        ComboAgregado combo = new ComboAgregado(new HamburguerArtesanal(), new BatataRustica(), 10.0);
+        assertInstanceOf(IHamburguer.class, combo);
     }
 }
