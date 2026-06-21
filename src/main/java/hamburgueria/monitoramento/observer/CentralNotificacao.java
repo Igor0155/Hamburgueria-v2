@@ -15,8 +15,6 @@ public class CentralNotificacao {
     }
 
     public void notificarMudanca(String idPedido, String novoStatus) {
-        // Uso de For interno exigido pelo padrão para notificar lista.
-        // A regra "sem for" aplica-se rigorosamente aos métodos de Teste (Junit).
         for (IStatusObserver observer : new ArrayList<>(this.inscritos)) {
             observer.atualizarStatusTela(idPedido, novoStatus);
         }
