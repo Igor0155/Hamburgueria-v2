@@ -92,10 +92,9 @@ public class TerminalAtendimentoTest {
         terminal.adicionarComboPronto(new ComboArtesanalFactory());
         PedidoFacade facade = new PedidoFacade();
         PrecoTaxaNoturnaStrategy estrategia = new PrecoTaxaNoturnaStrategy();
-        GatewayReal gateway = new GatewayReal();
-        PagamentoPix pix = new PagamentoPix(new StripeAPI());
+        GatewayReal gateway = new GatewayReal(new PagamentoPix(new StripeAPI()));
 
-        assertTrue(terminal.fecharPedido(facade, estrategia, gateway, pix));
+        assertTrue(terminal.fecharPedido(facade, estrategia, gateway));
     }
 
     @Test
@@ -165,7 +164,7 @@ public class TerminalAtendimentoTest {
 
     @Test
     public void devePropagarIllegalArgumentExceptionAoTentarFecharPedidoComFacadeNula() {
-        assertThrows(IllegalArgumentException.class, () -> terminal.fecharPedido(null, null, null, null));
+        assertThrows(IllegalArgumentException.class, () -> terminal.fecharPedido(null, null, null));
     }
 
     @Test
