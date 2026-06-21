@@ -65,9 +65,9 @@ Orquestração assíncrona, garantia de qualidade e comunicação externa.
 
 ## 🧪 Suíte de Testes e Qualidade
 
-O projeto conta com um total de **287 casos de testes executados com sucesso** via JUnit 5.
+O projeto conta com um total de **302 casos de testes executados com sucesso** via JUnit 5.
 
-![alt text](image-1.png)
+![alt text](testes.png)
 
 Regras rigorosas aplicadas à engenharia de testes:
 
