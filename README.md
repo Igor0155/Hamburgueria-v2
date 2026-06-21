@@ -79,7 +79,7 @@ Regras rigorosas aplicadas à engenharia de testes:
 
 ## Diagrama
 
-![alt text](diagram-class.png)
+![alt text](Diagrama-atualizado.png)
 
 ## 🚀 Como Executar
 
