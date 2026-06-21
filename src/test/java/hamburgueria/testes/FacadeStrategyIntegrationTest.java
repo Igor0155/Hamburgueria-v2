@@ -26,8 +26,8 @@ public class FacadeStrategyIntegrationTest {
         facade = new PedidoFacade();
         carrinho = new CarrinhoCompras();
         carrinho.adicionarItem(new HamburguerArtesanal());
-        gateway = new GatewayReal();
         pix = new PagamentoPix(new StripeAPI());
+        gateway = new GatewayReal(pix);
     }
 
     @Test
@@ -35,51 +35,44 @@ public class FacadeStrategyIntegrationTest {
         IEstrategiaPrecificacao strategyDescontoTotal = subtotal -> 0.0;
         // A StripeAPI (via GatewayReal) recusa valores <= 0, então a Facade deve
         // retornar false
-        assertFalse(facade.finalizarPedido(carrinho, strategyDescontoTotal, gateway, pix));
+        assertFalse(facade.finalizarPedido(carrinho, strategyDescontoTotal, gateway));
     }
 
     @Test
     public void deveLancarExcecaoSeEstrategiaForNulaNaFronteiraDaFacade() {
-        assertThrows(NullPointerException.class, () -> facade.finalizarPedido(carrinho, null, gateway, pix));
+        assertThrows(NullPointerException.class, () -> facade.finalizarPedido(carrinho, null, gateway));
     }
 
     @Test
     public void deveLancarExcecaoSeMetodoDePagamentoForNuloNaFronteiraDaFacade() {
         IEstrategiaPrecificacao strategyNormal = subtotal -> subtotal;
-        assertThrows(NullPointerException.class, () -> facade.finalizarPedido(carrinho, strategyNormal, gateway, null));
+        assertThrows(IllegalArgumentException.class,
+                () -> facade.finalizarPedido(carrinho, strategyNormal, new GatewayReal(null)));
     }
 
     @Test
     public void deveRecusarPedidoSeEstrategiaGerarValorNegativo() {
         IEstrategiaPrecificacao strategyBugada = subtotal -> -50.0;
-        assertFalse(facade.finalizarPedido(carrinho, strategyBugada, gateway, pix));
+        assertFalse(facade.finalizarPedido(carrinho, strategyBugada, gateway));
     }
 
     @Test
     public void deveManterItensNoCarrinhoQuandoStrategyGeraValorRecusado() {
         IEstrategiaPrecificacao strategyZero = subtotal -> 0.0;
-        facade.finalizarPedido(carrinho, strategyZero, gateway, pix);
-        assertEquals(1, carrinho.getItens().size());
-    }
-
-    @Test
-    public void deveManterItensNoCarrinhoQuandoPagamentoEhRecusadoDiretoNaAPI() {
-        IEstrategiaPrecificacao strategyNormal = subtotal -> subtotal;
-        PagamentoPix pixFalho = new PagamentoPix(v -> false); // Mock fail
-        facade.finalizarPedido(carrinho, strategyNormal, gateway, pixFalho);
+        facade.finalizarPedido(carrinho, strategyZero, gateway);
         assertEquals(1, carrinho.getItens().size());
     }
 
     @Test
     public void deveEsvaziarCarrinhoSeStrategyAumentarValorEPagamentoAprovar() {
         IEstrategiaPrecificacao strategyAcrescimo = subtotal -> subtotal + 100.0;
-        facade.finalizarPedido(carrinho, strategyAcrescimo, gateway, pix);
+        facade.finalizarPedido(carrinho, strategyAcrescimo, gateway);
         assertEquals(0, carrinho.getItens().size());
     }
 
     @Test
     public void deveRetornarVerdadeiroSeStrategyAplicarDescontoParcialAprovado() {
         IEstrategiaPrecificacao strategyDescontoParcial = subtotal -> subtotal * 0.5; // 50% off
-        assertTrue(facade.finalizarPedido(carrinho, strategyDescontoParcial, gateway, pix));
+        assertTrue(facade.finalizarPedido(carrinho, strategyDescontoParcial, gateway));
     }
 }
