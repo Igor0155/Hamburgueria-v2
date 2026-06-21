@@ -29,12 +29,11 @@ public class PedidoFacade {
         if (pago) {
             PedidoCozinha pedidoCozinha = new PedidoCozinha("PED-" + System.nanoTime());
 
-            // Repassa os tipos de alimento (Ponte do Grupo 3)
+            // Repassa os tipos de alimento
             for (IHamburguer item : carrinho.getItens()) {
                 pedidoCozinha.adicionarAlimentoParaPreparo(new TipoHamburguer());
             }
 
-            // PONTE DO GRUPO 4: Aciona o EventBus
             EventBus.getInstancia().publicar(new EventoPedidoPago(pedidoCozinha));
             carrinho.esvaziar();
         }
