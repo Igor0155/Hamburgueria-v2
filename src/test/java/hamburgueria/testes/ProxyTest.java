@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import hamburgueria.financeiro.bridge.MetodoPagamentoAbstraction;
 import hamburgueria.financeiro.bridge.PagamentoPix;
 import hamburgueria.financeiro.bridge.StripeAPI;
 import hamburgueria.financeiro.proxy.GatewayPagamentoProxy;
@@ -17,130 +16,125 @@ import hamburgueria.financeiro.proxy.IGatewayPagamento;
 
 public class ProxyTest {
     private IGatewayPagamento proxy;
-    private MetodoPagamentoAbstraction metodo;
-    private MetodoPagamentoAbstraction metodoFalho;
-    private MetodoPagamentoAbstraction metodoSucesso;
 
     @BeforeEach
     public void setup() {
-        proxy = new GatewayPagamentoProxy(new GatewayReal());
-        metodo = new PagamentoPix(new StripeAPI());
-        metodoFalho = new PagamentoPix(v -> false);
-        metodoSucesso = new PagamentoPix(v -> true);
+        // Mock Dinâmico: Retorna 'true' (sucesso) se o valor for 50.0, e 'false'
+        // (falha) para qualquer outro (ex: 10.0).
+        proxy = new GatewayPagamentoProxy(new GatewayReal(new PagamentoPix(v -> v == 50.0)));
     }
 
     @Test
     public void deveAprovarPagamentoNormal() {
-        assertTrue(proxy.cobrar(metodo, 50.0));
+        assertTrue(proxy.cobrar(50.0));
     }
 
     @Test
     public void deveLancarExcecaoValorNegativoProxy() {
-        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(metodo, -10.0));
+        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(-10.0));
     }
 
     @Test
     public void deveLancarExcecaoValorZeroProxy() {
-        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(metodo, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(0.0));
     }
 
     @Test
     public void deveBloquearPagamentoAposTresTentativasFalhas() {
-        MetodoPagamentoAbstraction metodoFalho = new PagamentoPix(v -> false);
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
-        assertThrows(SecurityException.class, () -> proxy.cobrar(metodoFalho, 10.0));
+        proxy.cobrar(10.0); // 1ª falha
+        proxy.cobrar(10.0); // 2ª falha
+        proxy.cobrar(10.0); // 3ª falha
+        assertThrows(SecurityException.class, () -> proxy.cobrar(10.0));
     }
 
     @Test
     public void deveZerarTentativasAposSucesso() {
-        MetodoPagamentoAbstraction metodoFalho = new PagamentoPix(v -> false);
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
-        assertTrue(proxy.cobrar(metodo, 50.0)); // Sucesso reseta
+        proxy.cobrar(10.0); // 1ª falha
+        proxy.cobrar(10.0); // 2ª falha
+        assertTrue(proxy.cobrar(50.0)); // Sucesso 50.0 reseta o contador
     }
 
     @Test
     public void deveGarantirAcoplamentoCorretoGatewayReal() {
-        IGatewayPagamento real = new GatewayReal();
-        assertTrue(real.cobrar(metodo, 50.0));
+        assertTrue(proxy.cobrar(50.0));
     }
 
     @Test
     public void devePermitirDuasTentativasFalhasSemBloquear() {
-        MetodoPagamentoAbstraction metodoFalho = new PagamentoPix(v -> false);
-        proxy.cobrar(metodoFalho, 10.0);
-        assertFalse(proxy.cobrar(metodoFalho, 10.0));
+        proxy.cobrar(10.0);
+        assertFalse(proxy.cobrar(10.0));
     }
 
     @Test
     public void deveManterInterfaceIgualEntreProxyEReal() {
-        assertInstanceOf(IGatewayPagamento.class, new GatewayPagamentoProxy(new GatewayReal()));
+        assertInstanceOf(IGatewayPagamento.class,
+                new GatewayPagamentoProxy(new GatewayReal(new PagamentoPix(new StripeAPI()))));
     }
 
     @Test
     public void devePermitirExatamenteUmaFalhaSemBloquear() {
-        proxy.cobrar(metodoFalho, 10.0);
-        assertDoesNotThrow(() -> proxy.cobrar(metodoSucesso, 10.0));
+        proxy.cobrar(10.0); // 1ª falha
+        assertDoesNotThrow(() -> proxy.cobrar(50.0));
     }
 
     @Test
     public void devePermitirExatamenteDuasFalhasSemBloquear() {
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
-        assertDoesNotThrow(() -> proxy.cobrar(metodoSucesso, 10.0));
+        proxy.cobrar(10.0); // 1ª falha
+        proxy.cobrar(10.0); // 2ª falha
+        assertDoesNotThrow(() -> proxy.cobrar(50.0));
     }
 
     @Test
     public void deveBloquearExatamenteNaTerceiraTentativaFalha() {
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
-        assertThrows(SecurityException.class, () -> proxy.cobrar(metodoSucesso, 10.0));
+        proxy.cobrar(10.0); // 1ª falha
+        proxy.cobrar(10.0); // 2ª falha
+        proxy.cobrar(10.0); // 3ª falha
+        assertThrows(SecurityException.class, () -> proxy.cobrar(50.0));
     }
 
     @Test
     public void deveRecusarNovaCobrancaComValorInvalidoMesmoAposBloqueio() {
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
-        proxy.cobrar(metodoFalho, 10.0);
+        proxy.cobrar(10.0);
+        proxy.cobrar(10.0);
+        proxy.cobrar(10.0);
         // A validação de valor (<= 0) vem antes do bloqueio por fraude no nosso proxy
-        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(metodoSucesso, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(0.0));
     }
 
     @Test
     public void deveZerarContagemDeFraudeAoIntercalarFalhaESucesso() {
-        proxy.cobrar(metodoFalho, 10.0); // 1ª falha
-        proxy.cobrar(metodoFalho, 10.0); // 2ª falha
-        proxy.cobrar(metodoSucesso, 10.0); // Sucesso! Zera contador.
-        proxy.cobrar(metodoFalho, 10.0); // 1ª falha nova
-        proxy.cobrar(metodoFalho, 10.0); // 2ª falha nova
-        assertDoesNotThrow(() -> proxy.cobrar(metodoSucesso, 10.0));
+        proxy.cobrar(10.0); // 1ª falha
+        proxy.cobrar(10.0); // 2ª falha
+        proxy.cobrar(50.0); // Sucesso! Zera contador.
+        proxy.cobrar(10.0); // 1ª falha nova
+        proxy.cobrar(10.0); // 2ª falha nova
+        assertDoesNotThrow(() -> proxy.cobrar(50.0));
     }
 
     @Test
     public void devePropagarExcecaoOriginalSeMetodoDePagamentoForNulo() {
-        assertThrows(NullPointerException.class, () -> proxy.cobrar(null, 10.0));
+        // A injeção nula dispara IllegalArgumentException direto no construtor do
+        // GatewayReal
+        assertThrows(IllegalArgumentException.class, () -> new GatewayPagamentoProxy(new GatewayReal(null)));
     }
 
     @Test
     public void deveLancarExcecaoValorNegativoSemIncrementarTentativas() {
-        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(metodoFalho, -10.0));
-        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(metodoFalho, -10.0));
-        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(metodoFalho, -10.0));
-        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(metodoFalho, -10.0));
+        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(-10.0));
+        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(-10.0));
+        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(-10.0));
+        assertThrows(IllegalArgumentException.class, () -> proxy.cobrar(-10.0));
         // Se as exceções acima tivessem contado como fraude, a linha abaixo daria
         // SecurityException
-        assertDoesNotThrow(() -> proxy.cobrar(metodoSucesso, 10.0));
+        assertDoesNotThrow(() -> proxy.cobrar(50.0));
     }
 
     @Test
     public void deveGarantirQuePagamentosValidosMultiplosNaoAcionamBloqueio() {
-        proxy.cobrar(metodoSucesso, 10.0);
-        proxy.cobrar(metodoSucesso, 10.0);
-        proxy.cobrar(metodoSucesso, 10.0);
-        proxy.cobrar(metodoSucesso, 10.0);
-        assertDoesNotThrow(() -> proxy.cobrar(metodoSucesso, 10.0));
+        proxy.cobrar(50.0);
+        proxy.cobrar(50.0);
+        proxy.cobrar(50.0);
+        proxy.cobrar(50.0);
+        assertDoesNotThrow(() -> proxy.cobrar(50.0));
     }
 }
