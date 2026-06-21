@@ -6,12 +6,13 @@ import java.util.List;
 import hamburgueria.carrinho.CarrinhoCompras;
 import hamburgueria.carrinho.command.AdicionarItemCommand;
 import hamburgueria.carrinho.command.InvocadorCarrinho;
+import hamburgueria.catalogo.factory.ComboAgregado;
+import hamburgueria.catalogo.factory.IAcompanhamento;
 import hamburgueria.catalogo.factory.IComboFactory;
 import hamburgueria.catalogo.factory.IHamburguer;
 import hamburgueria.catalogo.iterator.IIteradorCardapio;
 import hamburgueria.catalogo.prototype.IPrototipoCombo;
 import hamburgueria.checkout.facade.PedidoFacade;
-import hamburgueria.financeiro.bridge.MetodoPagamentoAbstraction;
 import hamburgueria.financeiro.proxy.IGatewayPagamento;
 import hamburgueria.financeiro.strategy.IEstrategiaPrecificacao;
 
@@ -46,7 +47,9 @@ public class TerminalAtendimento {
         }
         // Aciona a Factory e converte imediatamente em um Command para o Carrinho
         IHamburguer burger = comboFactory.criarHamburguer();
-        invocador.executarComando(new AdicionarItemCommand(this.carrinho, burger));
+        IAcompanhamento side = comboFactory.criarAcompanhamento();
+        IHamburguer comboCompleto = new ComboAgregado(burger, side, 12.0);
+        invocador.executarComando(new AdicionarItemCommand(this.carrinho, comboCompleto));
     }
 
     public IPrototipoCombo repetirUltimoPedido(IPrototipoCombo ultimoPedidoSalvo) {
@@ -63,7 +66,7 @@ public class TerminalAtendimento {
     }
 
     public boolean fecharPedido(PedidoFacade facade, IEstrategiaPrecificacao estrategia,
-            IGatewayPagamento gateway, MetodoPagamentoAbstraction metodo) {
+            IGatewayPagamento gateway) {
         if (facade == null) {
             throw new IllegalArgumentException("Sistema de checkout indisponível.");
         }
